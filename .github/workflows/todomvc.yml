@@ -27,8 +27,8 @@ jobs:
         node-version: "8.16.2"  
     - name: npm install, build, and test
       run: |
-        ls -la
-        npm ci
+        cd examples/vue
+        npm install
         npm run build --if-present
         npm test
       env:
