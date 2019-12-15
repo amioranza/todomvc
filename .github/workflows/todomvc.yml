@@ -7,16 +7,16 @@ on:
 
 env:
   CI: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   prepare-build-test:
     runs-on: ubuntu-latest
 
-    steps:
-    - env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    steps:      
+    
     - uses: actions/checkout@master
+
     - name: Github Info
       run: |
         echo "GITHUB_ACTION: $GITHUB_ACTION"
