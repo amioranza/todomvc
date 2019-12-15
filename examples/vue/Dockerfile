@@ -12,7 +12,6 @@ COPY package.json /usr/src/app/
 RUN npm install
 COPY js /usr/src/app/js
 COPY node_modules /usr/src/app/node_modules
-RUN npm run build
 
 ############################################
 ### IMAGE BUILD STAGE
