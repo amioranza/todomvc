@@ -33,7 +33,7 @@ jobs:
         CI: true
       run: |
         cd $GITHUB_WORKSPACE/examples/vue
-        docker login docker.pkg.github.com -u "${OWNER}" -p "${GITHUB_TOKEN}"
+        docker login docker.pkg.github.com -u "${OWNER}" --password-stdin "${GITHUB_TOKEN}"
         export LOWERCASE_REPOSITORY=$(echo "$GITHUB_REPOSITORY" | tr "[:upper:]" "[:lower:]")
         export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:${VERSION}"
         docker build -t $IMAGE_NAME .
