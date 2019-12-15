@@ -32,5 +32,6 @@ jobs:
         CI: true
       run: |
         cd examples/vue
+        export LOWERCASE_REPOSITORY=$(echo "$GITHUB_REPOSITORY" | tr "[:upper:]" "[:lower:]")
         export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:${VERSION}"
         docker build -t $IMAGE_NAME .
