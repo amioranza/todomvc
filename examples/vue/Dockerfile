@@ -33,4 +33,4 @@ COPY --from=appbuild /usr/src/app/node_modules /usr/src/app/node_modules
 
 EXPOSE  3000
 
-CMD [ "node", "dist" ]
+CMD [ "node", "js" ]
