@@ -40,6 +40,6 @@ jobs:
         echo "token: ${GITHUB_TOKEN}"
         echo "repo: ${GITHUB_REPOSITORY}"
         echo "version: ${VERSION}"
-        docker login -u ${OWNER} --password-stdin ${GITHUB_TOKEN} docker.pkg.github.com
+        docker login -u ${OWNER} -p ${GITHUB_TOKEN} docker.pkg.github.com
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
