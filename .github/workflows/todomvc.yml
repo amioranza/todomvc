@@ -29,13 +29,12 @@ jobs:
     - name: npm install, build, and test
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: v${GITHUB_SHA}
         CI: true
       run: |
         cd $GITHUB_WORKSPACE/examples/vue
         export OWNER="${GITHUB_REPOSITORY%/*}"
         export LOWERCASE_REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | tr "[:upper:]" "[:lower:]")
-        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:${VERSION}"
+        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:v${GITHUB_SHA}"
         echo "owner: ${OWNER}"
         echo "token: ${GITHUB_TOKEN}"
         echo "repo: ${GITHUB_REPOSITORY}"
