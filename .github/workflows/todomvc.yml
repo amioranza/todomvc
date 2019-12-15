@@ -13,7 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: actions/checkout@master
     - name: Github Info
       run: |
         echo "GITHUB_ACTION: $GITHUB_ACTION"
@@ -24,16 +27,15 @@ jobs:
         echo "github.event_name: ${{ github.event_name }}"
         cat $GITHUB_EVENT_PATH
 
-    - name: Use Node.js 8.16.2
-      uses: actions/setup-node@v1
-      with:
-        node-version: "8.16.2"
-
-    - name: npm install, build, and test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: build
       run: |
-        cd $GITHUB_WORKSPACE/examples/vue
+        cd $GITHUB_WORKSPACE/examples/vue        
+        export LOWERCASE_REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | tr "[:upper:]" "[:lower:]")
+        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:v${GITHUB_SHA}"
+        docker build -t $IMAGE_NAME .
+
+    - name: publish
+      run: |
         export OWNER="${GITHUB_REPOSITORY%/*}"
         export LOWERCASE_REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | tr "[:upper:]" "[:lower:]")
         export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:v${GITHUB_SHA}"
@@ -42,5 +44,4 @@ jobs:
         echo "repo: ${GITHUB_REPOSITORY}"
         echo "version: ${VERSION}"
         docker login -u ${OWNER} -p ${GITHUB_TOKEN} docker.pkg.github.com
-        docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
