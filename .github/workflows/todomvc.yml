@@ -22,6 +22,7 @@ jobs:
         cat $GITHUB_EVENT_PATH
   
   setup:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
     - name: Use Node.js 8.16.2
@@ -30,6 +31,7 @@ jobs:
         node-version: "8.16.2"  
   
   docker_build:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
     - name: npm install, build, and test
