@@ -29,7 +29,7 @@ jobs:
     - name: npm install, build, and test
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: v${{ github.event.id }}
+        VERSION: v${GITHUB_SHA}
         CI: true
       run: |
         cd $GITHUB_WORKSPACE/examples/vue
