@@ -5,8 +5,11 @@ on:
     branches:
       - master
 
+env:
+  CI: true
+
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +25,7 @@ jobs:
         cat $GITHUB_EVENT_PATH
   
   build-docker:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
     - name: Use Node.js 8.16.2
@@ -32,7 +36,6 @@ jobs:
     - name: npm install, build, and test
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CI: true
       run: |
         cd $GITHUB_WORKSPACE/examples/vue
         export OWNER="${GITHUB_REPOSITORY%/*}"
