@@ -9,7 +9,7 @@ env:
   CI: true
 
 jobs:
-  prepare:
+  prepare-build-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,11 +23,7 @@ jobs:
         echo "GITHUB_BASE_REF: $GITHUB_BASE_REF"
         echo "github.event_name: ${{ github.event_name }}"
         cat $GITHUB_EVENT_PATH
-  
-  build-docker:
-    needs: prepare
-    runs-on: ubuntu-latest
-    steps:
+
     - name: Use Node.js 8.16.2
       uses: actions/setup-node@v1
       with:
