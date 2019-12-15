@@ -24,7 +24,10 @@ jobs:
     - name: Use Node.js 8.16.2
       uses: actions/setup-node@v1
       with:
-        node-version: "8.16.2"
+        node-version: "8.16.2" 
+        repo-token: ${{ secrets.GITHUB_TOKEN }} 
+  
+    - name: npm install, build, and test
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         VERSION: v${{ github.event.number }}
