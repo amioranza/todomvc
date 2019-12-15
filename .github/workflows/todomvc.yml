@@ -26,8 +26,11 @@ jobs:
       with:
         node-version: "8.16.2"  
     - name: npm install, build, and test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: v${{ github.event.number }}
+        CI: true
       run: |
         cd examples/vue
+        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:${VERSION}"
         docker build -t $IMAGE_NAME .
-      env:
-        CI: true
