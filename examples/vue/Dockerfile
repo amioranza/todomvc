@@ -30,7 +30,6 @@ RUN npm install --production && npm cache clean --force
 # Bundle app source
 COPY --from=appbuild /usr/src/app/js /usr/src/app/js
 COPY --from=appbuild /usr/src/app/node_modules /usr/src/app/node_modules
-COPY config /usr/src/app/config
 
 EXPOSE  3000
 
