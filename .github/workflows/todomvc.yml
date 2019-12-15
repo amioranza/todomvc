@@ -40,7 +40,7 @@ jobs:
         VERSION: v${{ github.event.number }}
         CI: true
       run: |
-        cd examples/vue
+        cd $GITHUB_WORKSPACE/examples/vue
         docker login docker.pkg.github.com -u "${OWNER}" -p "${GITHUB_TOKEN}"
         export LOWERCASE_REPOSITORY=$(echo "$GITHUB_REPOSITORY" | tr "[:upper:]" "[:lower:]")
         export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:${VERSION}"
