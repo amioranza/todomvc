@@ -48,4 +48,4 @@ jobs:
         echo "version: ${VERSION}"
         docker login -u ${OWNER} -p ${GITHUB_TOKEN} docker.pkg.github.com
         docker push $IMAGE_NAME:$IMAGE_TAG
-        docekr push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:latest
