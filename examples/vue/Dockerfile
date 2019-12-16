@@ -1,36 +1,22 @@
-############################################
-### APP BUILD STAGE
-############################################
-FROM node:carbon AS appbuild
+FROM node:lts-alpine as setup-stage
+WORKDIR /app
+RUN npm install -g @vue/cli todomvc todomvc-app-css && \
+  vue create -d -f -n todomvc && \
+  cd todomvc && \
+  npm run build 
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+COPY index.html /app/todomvc/dist/index.html
+COPY js /app/todomvc/dist/js
+COPY node_modules /app/todomvc/dist/node_modules
 
-# Install app dependencies
-COPY package.json /usr/src/app/
-RUN npm install
-COPY js /usr/src/app/js
-COPY node_modules /usr/src/app/node_modules
-RUN ls -la
+# FROM node:lts-alpine as build-stage
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install && ls -la
+# COPY . .
+# RUN npm run build
 
-############################################
-### IMAGE BUILD STAGE
-############################################
-FROM node:carbon
-
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-# Install app dependencies
-COPY package.json /usr/src/app/
-RUN npm install --production && npm cache clean --force
-
-# Bundle app source
-COPY --from=appbuild /usr/src/app/js /usr/src/app/js
-COPY --from=appbuild /usr/src/app/node_modules /usr/src/app/node_modules
-
-EXPOSE  3000
-
-CMD [ "node", "js" ]
+FROM nginx:stable-alpine as production-stage
+COPY --from=setup-stage /app/todomvc/dist/ /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
