@@ -29,19 +29,23 @@ jobs:
 
     - name: build
       run: |
-        cd $GITHUB_WORKSPACE/examples/vue        
+        cd $GITHUB_WORKSPACE/examples/vue
         export LOWERCASE_REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | tr "[:upper:]" "[:lower:]")
-        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:v${GITHUB_SHA}"
-        docker build -t $IMAGE_NAME .
+        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc"
+        export IMAGE_TAG="v${GITHUB_SHA}"
+        docker build -t $IMAGE_NAME:$IMAGE_TAG .
+        docker build -t $IMAGE_NAME:latest .
 
     - name: publish
       run: |
         export OWNER="${GITHUB_REPOSITORY%/*}"
         export LOWERCASE_REPOSITORY=$(echo "${GITHUB_REPOSITORY}" | tr "[:upper:]" "[:lower:]")
-        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc:v${GITHUB_SHA}"
+        export IMAGE_NAME="docker.pkg.github.com/${LOWERCASE_REPOSITORY}/todomvc"
+        export IMAGE_TAG="v${GITHUB_SHA}"
         echo "owner: ${OWNER}"
         echo "token: ${GITHUB_TOKEN}"
         echo "repo: ${GITHUB_REPOSITORY}"
         echo "version: ${VERSION}"
         docker login -u ${OWNER} -p ${GITHUB_TOKEN} docker.pkg.github.com
-        docker push $IMAGE_NAME
+        docker push $IMAGE_NAME:$IMAGE_TAG
+        docekr push $IMAGE_NAME:latest
