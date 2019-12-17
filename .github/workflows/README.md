@@ -1,4 +1,14 @@
-# Pipeline Documentation
+# How to test it
+
+Fork this repo:
+
+https://github.com/amioranza/todomvc
+
+This repo have the Github Actions Workflow, by default it is disable, you need to click on Actions an then click in the green but to activate the Github Actions.
+
+Every push to master will trigger a new build.
+
+## Pipeline Documentation
 
 ## When it runs
 
@@ -186,15 +196,35 @@ You can run the generated docker image with the steps bellow:
 
 ```
 docker login -u <githubuser> -p <githubpersonaltoken> docker.pkg.github.com
-docker run -it -d -p 3000:80 --name todomvc docker.pkg.github.com/amioranza/todomvc/todomvc:latest
+docker run -it -d -p 3000:80 --name todomvc docker.pkg.github.com/<githubuser>/todomvc/todomvc:latest
 ```
 
 Access http://localhost:3000 and you can access the todomvc vue.js version
 
 ## How to deploy to Kubernetes
 
+First you need to create the secret with your credentials to the Github Docker Registry
+
+```
+kubectl create secret docker-registry registry --docker-server=docker.pkg.github.com --docker-username=<githubuser> --docker-password=<gu=ithubpersonaltoken>
+```
+
 To deploy on kubernetes you can run the commands bellow:
 
 ```
 kubectl apply -f k8s/todomvc.yml
 ```
+
+To access the access the aplication you need to discover at leat one of the nodes IP and the service port to access the application:
+
+```
+kubectl get nodes -o wide
+```
+
+Choose any IP of nodes with the worker role, then get the service port of the deployment:
+
+```
+kubectl get svc todomvc -o json | jq '.spec.ports[]  | .nodePort'
+```
+
+Then access the url like this `http://<discovered_node_ip>:<service_port>`

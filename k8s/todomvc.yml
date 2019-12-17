@@ -12,6 +12,8 @@ spec:
       labels:
         app: todomvc
     spec:
+      imagePullSecrets:
+        - name: registry
       containers:
       - name: todomvc
         image: docker.pkg.github.com/amioranza/todomvc/todomvc
@@ -37,21 +39,7 @@ spec:
   - protocol: TCP
     port: 80
     name: http
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: todomvc
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: todomvc
-          servicePort: http
+  type: NodePort
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
