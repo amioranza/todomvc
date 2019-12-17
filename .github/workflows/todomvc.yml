@@ -13,8 +13,8 @@ jobs:
   prepare-build-publish:
     runs-on: ubuntu-latest
 
-    steps:      
-    
+    steps:
+
     - uses: actions/checkout@master
 
     - name: Github Info

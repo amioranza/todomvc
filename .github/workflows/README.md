@@ -179,3 +179,22 @@ CMD ["nginx", "-g", "daemon off;"]
                         |                                 |
                         +---------------------------------+
 ```
+
+## How to run it on Docker
+
+You can run the generated docker image with the steps bellow:
+
+```
+docker login -u <githubuser> -p <githubpersonaltoken> docker.pkg.github.com
+docker run -it -d -p 3000:80 --name todomvc docker.pkg.github.com/amioranza/todomvc/todomvc:latest
+```
+
+Access http://localhost:3000 and you can access the todomvc vue.js version
+
+## How to deploy to Kubernetes
+
+To deploy on kubernetes you can run the commands bellow:
+
+```
+kubectl apply -f k8s/todomvc.yml
+```

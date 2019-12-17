@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todomvc
+spec:
+  selector:
+    matchLabels:
+      app: todomvc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: todomvc
+    spec:
+      containers:
+      - name: todomvc
+        image: docker.pkg.github.com/amioranza/todomvc/todomvc
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "250m"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: todomvc
+spec:
+  selector:
+    app: todomvc
+  ports:
+  - protocol: TCP
+    port: 80
+    name: http
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: todomvc
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: todomvc
+          servicePort: http
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: endpoint-operator
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: todomvc
+  targetCPUUtilizationPercentage: 50
