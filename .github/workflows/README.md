@@ -4,9 +4,9 @@ Fork this repo:
 
 https://github.com/amioranza/todomvc
 
-This repo have the Github Actions Workflow, by default it is disable, you need to click on Actions an then click in the green but to activate the Github Actions.
+This repo have the Github Actions Workflow, by default it is disable, you need to click on Actions an then click in the green button to activate the Github Actions.
 
-Every push to master will trigger a new build.
+Every push to the master branch will trigger a new build.
 
 ## Pipeline Documentation
 
@@ -25,7 +25,7 @@ It means that every line of code pushed to the master branch will generate a new
 
 ## What it does
 
-First it defines two global env vars to use on all steps of oour pipeline:
+First it defines two global env vars to use on all steps of this pipeline:
 
 ```
 env:
@@ -33,9 +33,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-After the environment variables it will open the jobs sectio, where on job called prepare-build-publish was created. The name of the job must be as descriptive as possible to makes easy to understand it purpose.
+After the environment variables it has the jobs section, where the job called prepare-build-publish was created. The name of the job must be as descriptive as possible to makes it easy to understand its purpose.
 
-This job have steps that effectivelly prepare, clone the repository, build, build the multi stage docker image and finally publish, it publishes the docker image using two tags: the first is the SHA256 hash of the commit and the second is the tag latest to make it easy to consume.
+This job have steps that effectively prepare (clone the repository) , build (build the multi stage docker image) and finally publish (publish the docker image) using two tags: the first is the SHA256 hash of the commit and the second is the tag `latest` to make it easy to use on the yaml and command line.
 
 
 ```
@@ -49,7 +49,7 @@ The directive runs-on defines the operating system of the job runner, in this ca
     runs-on: ubuntu-latest
 ```
 
-The first step/action is to call a default function to checkou the repository code and the @master defines the branch to be checked out.
+The first step/action calls a default function to checkout the repository code and the `@master` defines the branch to be checked out.
 
 ```
     steps:
@@ -57,7 +57,7 @@ The first step/action is to call a default function to checkou the repository co
     - uses: actions/checkout@master
 ```
 
-The next step is the Github info output just for information of the vairables avaliable on the environment, it calls the run directive where bash commands can be executed.
+The next step is the Github info output just to show off the vairables avaliable in the environment, it calls the run directive where bash commands will be executed.
 
 ```
     - name: Github Info
@@ -71,7 +71,7 @@ The next step is the Github info output just for information of the vairables av
         cat $GITHUB_EVENT_PATH
 ```
 
-The build step is the most important step, it will build the application using the Dockerfile that resides in the exmaples/vue directory of the repo. If some change is needed it have to be done on the Dockerfile itself. The build step will always execute the build of the container image considering a clean enviroment. It builds the first container tag with the SHA256 hash of the commit and repeat the command to add a second tag to the container defined as latest.
+The build step is the most important step, it will build the application using the Dockerfile that resides in the examples/vue directory of the repo. If some change is needed it have to be done on the Dockerfile itself. The build step will always execute the build of the container image considering a clean environment. It builds the first container tag with the SHA256 hash of the commit and repeat the command to add a second tag to the container defined as `latest`.
 
 ```
     - name: build
@@ -84,7 +84,7 @@ The build step is the most important step, it will build the application using t
         docker build -t $IMAGE_NAME:latest .
 ```
 
-The final step of this Workflow isto publish the generated images in the GitHub Docker registry. It will show the package in the project page where you can pull or run this image after login on the Github Container registry.
+The final step of this Workflow is to publish the generated images in the GitHub Docker registry. It will show the package in the project page where you can pull or run this image after login on the Github Container registry.
 
 ```
     - name: publish
@@ -105,21 +105,21 @@ The final step of this Workflow isto publish the generated images in the GitHub 
 
 ## What the Dockerfile does
 
-This is a multi stage build, it menas that the build stage will not be sent to the final image keeping clean and as small as possible.
+This is a multi stage build, it means that the build stage will not be sent to the final image keeping it clean and as small as possible.
 
-The FROM directive defines the base image to use, in this case node:lts-alpine. The `as build-stage` is the name used for this stage to be referred by the next stage, more bellow.
+The `FROM` directive defines the base image to use, in this case node:lts-alpine. The `as build-stage` is the name used for this stage to be referred by the next stage, more bellow.
 
 ```
 FROM node:lts-alpine as build-stage
 ```
 
-The WORKDIR is a metadata directive, it does not create any layer, it only change the current working dir inside the container to the specified path.
+The `WORKDIR` is a metadata directive, it does not create any additional layer, it only changes the current working dir inside the container to the specified path.
 
 ```
 WORKDIR /app
 ```
 
-The RUN directive will run the commands listed. In this case it uses a chained sequence of commands where if some command fails all the chain fail. It aviods some broken builds. The commands used here install all the node dependencies, create a new vue.js project and build the project.
+The `RUN` directive will run the commands listed. In this case it uses a chained sequence of commands where if some command fails all the chain fail. It avoids some broken builds. The commands used here install all the node dependencies, create a new vue.js project and build the project.
 
 ```
 RUN npm install -g @vue/cli todomvc todomvc-app-css && \
@@ -128,7 +128,7 @@ RUN npm install -g @vue/cli todomvc todomvc-app-css && \
   npm run build
 ```
 
-All three following COPY directives copy artifacts from the repository to the container filesystem.
+The next three `COPY` directives copies the artifacts from the repository to the container filesystem.
 
 ```
 COPY index.html /app/todomvc/dist/index.html
@@ -136,25 +136,25 @@ COPY js /app/todomvc/dist/js
 COPY node_modules /app/todomvc/dist/node_modules
 ```
 
-To make the container smaller in size and more secure it uses the multi stage build where only the relevant artifacts generated by the container named as `build-stage` should be sent to the `production-stage` in this case the second container defined in the Dockerfile. The second FROM directive is the final artifact that will be sent to the Dokcer Registry to be used as the image of the service. This from uses the nginx:stable-alpine as the production image.
+To make the container smaller in size and more secure it uses the multi stage build where only the relevant artifacts generated by the container named as `build-stage` should be sent to the `production-stage` in this case the second container defined in the Dockerfile. The second `FROM` directive is the final artifact that will be sent to the Docker Registry to be used as the image of the service. This `FROM` directive uses the nginx:stable-alpine as the production image.
 
 ```
 FROM nginx:stable-alpine as production-stage
 ```
 
-The COPY directive uses the paramter `--from=build-stage` to tell the docker that the artifacts have to be copied from that stage to the current stage. It will copy everithing inside the dist directory from the `build-stage` to the nginx default directory in the `production-stage`.
+The `COPY` directive uses the paramter `--from=build-stage` to tell the docker that the artifacts have to be copied from that stage to the current stage. It will copy everything inside the dist directory from the `build-stage` to the nginx default directory in the `production-stage`.
 
 ```
 COPY --from=build-stage /app/todomvc/dist/ /usr/share/nginx/html
 ```
 
-The EXPOSE directive defines the public port of the container, it will be used as the published port when running the container via docker os any other container orchestrator.
+The `EXPOSE` directive defines the public port of the container, it will be used as the published port when running the container via docker or any other container orchestrator.
 
 ```
 EXPOSE 80
 ```
 
-The CMD directive is the default command line of that contaner. It means that all the time that container runs iti will run `nginx` with `-g` and `daemon off;` parameters. It can be override by specifying commands after the container image in the command line.
+The `CMD` directive is the default command line of that container. It means that all the time it runs it will run `nginx` with `-g` and `daemon off;` parameters. It can be overrided by specifying commands after the container image in the command line.
 
 ```
 CMD ["nginx", "-g", "daemon off;"]
@@ -179,10 +179,17 @@ CMD ["nginx", "-g", "daemon off;"]
                                                                                  |
                                                                 +--------------------------------+
                                                                 |                                |
-                                                                |  DOCKERFILE: Build container   |
+                                                                |    DOCKERFILE: build-stage     |
                                                                 |                                |
                                                                 +--------------------------------+
-                                                                                 |
+                                                                                  |
+                                                                                  |
+                                                                                  |
+                                                                +--------------------------------+
+                                                                |                                |
+                                                                |  DOCKERFILE: production-stage  |
+                                                                |                                |
+                                                                +--------------------------------+                                     |
                         +---------------------------------+                      |
                         |                                 |                      |
                         |        FLOW STEP: Publish       |----------------------|
@@ -195,8 +202,8 @@ CMD ["nginx", "-g", "daemon off;"]
 You can run the generated docker image with the steps bellow:
 
 ```
-docker login -u <githubuser> -p <githubpersonaltoken> docker.pkg.github.com
-docker run -it -d -p 3000:80 --name todomvc docker.pkg.github.com/<githubuser>/todomvc/todomvc:latest
+docker login -u <github_user> -p <github_personal_token> docker.pkg.github.com
+docker run -it -d -p 3000:80 --name todomvc docker.pkg.github.com/<github_user>/todomvc/todomvc:latest
 ```
 
 Access http://localhost:3000 and you can access the todomvc vue.js version
@@ -206,7 +213,7 @@ Access http://localhost:3000 and you can access the todomvc vue.js version
 First you need to create the secret with your credentials to the Github Docker Registry
 
 ```
-kubectl create secret docker-registry registry --docker-server=docker.pkg.github.com --docker-username=<githubuser> --docker-password=<gu=ithubpersonaltoken>
+kubectl create secret docker-registry registry --docker-server=docker.pkg.github.com --docker-username=<github_user> --docker-password=<gu=ithub_personal_token>
 ```
 
 To deploy on kubernetes you can run the commands bellow:
@@ -215,7 +222,7 @@ To deploy on kubernetes you can run the commands bellow:
 kubectl apply -f k8s/todomvc.yml
 ```
 
-To access the access the aplication you need to discover at leat one of the nodes IP and the service port to access the application:
+To access the access the aplication you need to discover at least one of the worker nodes IP and the service port to access the application:
 
 ```
 kubectl get nodes -o wide
@@ -228,3 +235,5 @@ kubectl get svc todomvc -o json | jq '.spec.ports[]  | .nodePort'
 ```
 
 Then access the url like this `http://<discovered_node_ip>:<service_port>`
+
+The yaml fille applied to the cluster will create the Horizontal Pod Autoscalling object. It will monitor the use o CPU of the container and if it hits the 50% threshold it will fire a new repolica of the same application. It will scale out and scale in the application based on the CPU consumption.
